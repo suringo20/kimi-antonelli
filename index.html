@@ -182,26 +182,26 @@
     .media__filter { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: .5rem 1.25rem; border-radius: 999px; font-size: .875rem; font-weight: 600; transition: all .15s; }
     .media__filter:hover { color: var(--text); border-color: #444; }
     .media__filter--active { background: var(--accent); color: var(--dark); border-color: var(--accent); }
-    .media__featured { border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid var(--border); transition: border-color .2s; }
-    .media__featured:hover { border-color: var(--accent); }
-    .media__featured-bg { height: 320px; background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); display: flex; align-items: center; justify-content: center; position: relative; }
-    .media__play-btn { width: 72px; height: 72px; border-radius: 50%; background: rgba(0,210,190,.9); color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: transform .2s; }
-    .media__featured:hover .media__play-btn { transform: scale(1.1); }
-    .media__playing-indicator { position: absolute; bottom: 1rem; left: 1rem; font-size: .75rem; font-weight: 600; color: var(--accent); letter-spacing: .05em; }
+    .media__featured { border-radius: 8px; overflow: hidden; border: 1px solid var(--border); transition: border-color .2s; }
+    .media__featured-bg { height: 320px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .media__featured-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .media__featured-iframe { display: block; width: 100%; height: 320px; border: none; }
+    .media__play-btn { position: relative; z-index: 1; width: 72px; height: 72px; border-radius: 50%; background: rgba(0,210,190,.9); color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: transform .2s; }
+    .media__featured-bg:hover .media__play-btn { transform: scale(1.1); }
     .media__featured-info { padding: 1.25rem 1.5rem; background: var(--surface); display: flex; align-items: center; gap: 1rem; }
     .media__featured-title { font-size: 1rem; font-weight: 700; flex: 1; }
-    .media__featured-duration { font-size: .8rem; color: var(--muted); flex-shrink: 0; }
     .media__grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.5rem; }
-    .media__card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: all .2s; }
+    .media__card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; transition: all .2s; }
     .media__card:hover { border-color: #444; transform: translateY(-2px); }
-    .media__card--playing { border-color: var(--accent); }
-    .media__thumb { height: 160px; background: linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); display: flex; align-items: center; justify-content: center; position: relative; }
-    .media__thumb-play { width: 48px; height: 48px; border-radius: 50%; background: rgba(0,210,190,.85); color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-    .media__type { position: absolute; bottom: .5rem; left: .5rem; font-size: .65rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #000; padding: .2rem .5rem; border-radius: 3px; }
+    .media__card-iframe { display: block; width: 100%; height: 160px; border: none; }
+    .media__thumb { height: 160px; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; background: #0d1117; }
+    .media__thumb-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .media__thumb-play { position: relative; z-index: 1; width: 48px; height: 48px; border-radius: 50%; background: rgba(0,210,190,.85); color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .media__type { position: absolute; bottom: .5rem; left: .5rem; font-size: .65rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #000; padding: .2rem .5rem; border-radius: 3px; z-index: 1; }
     .media__card-info { padding: 1rem; }
     .media__card-title { font-size: .9rem; font-weight: 600; line-height: 1.4; margin-bottom: .5rem; }
     .media__card-meta { display: flex; align-items: center; justify-content: space-between; font-size: .75rem; color: var(--muted); }
-    .media__share { background: none; border: none; color: var(--accent); font-size: .75rem; font-weight: 600; cursor: pointer; }
+    .media__share { background: none; border: none; color: var(--accent); font-size: .75rem; font-weight: 600; cursor: pointer; text-decoration: none; }
     .media__photos { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 1rem; }
     .media__photo { display: flex; flex-direction: column; gap: .5rem; }
     .media__photo-placeholder { aspect-ratio: 4/3; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; transition: border-color .15s, transform .2s; }
@@ -320,12 +320,12 @@
     ];
 
     const mediaVideos = [
-      { id:1, title:'Best Overtakes — 2025 Season So Far', duration:'4:32', type:'Highlights'  },
-      { id:2, title:'Onboard Lap — Suzuka Qualifying',     duration:'1:29', type:'Onboard'     },
-      { id:3, title:'Post-Race Interview — Imola Victory', duration:'3:10', type:'Interview'   },
-      { id:4, title:'Career Story: From Karting to F1',    duration:'8:45', type:'Documentary' },
-      { id:5, title:'Onboard Lap — Monaco Qualifying',     duration:'1:22', type:'Onboard'     },
-      { id:6, title:'Team Radio Highlights — 2025 Season', duration:'5:18', type:'Highlights'  },
+      { id:1, title:"Kimi Antonelli's Inevitable First Win",           youtubeId:'4KHDeTmaW3U', type:'Highlights'  },
+      { id:2, title:"Sprint Pole Lap — 2025 Miami Grand Prix",         youtubeId:'vGpGrp2kWvQ', type:'Onboard'     },
+      { id:3, title:"Kimi's FIRST LAP in the W16",                     youtubeId:'gsZPb2-Q-HU', type:'Onboard'     },
+      { id:4, title:"Post-Race Interview — F1 Italian GP 2025",        youtubeId:'FXNDFGwpdYQ', type:'Interview'   },
+      { id:5, title:"Kimi's Big F1 Reveal | Drive to Survive S7",      youtubeId:'I79on1PRcDs', type:'Documentary' },
+      { id:6, title:"Getting To Know Kimi Antonelli",                  youtubeId:'yDC2lo3qX6s', type:'Highlights'  },
     ];
 
     const photos = [
@@ -718,15 +718,27 @@
             <section className="section" style={{paddingTop:'2rem'}}>
               <div className="container">
                 <p className="section-label">Featured</p>
-                <div className="media__featured" onClick={() => setPlaying(playing==='featured'?null:'featured')}>
-                  <div className="media__featured-bg">
-                    <div className="media__play-btn">{playing==='featured'?'⏸':'▶'}</div>
-                    {playing==='featured'&&<div className="media__playing-indicator">Now playing</div>}
-                  </div>
+                <div className="media__featured">
+                  {playing==='featured'
+                    ? <iframe
+                        className="media__featured-iframe"
+                        src={`https://www.youtube.com/embed/${mediaVideos[0].youtubeId}?autoplay=1`}
+                        title={mediaVideos[0].title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    : <div className="media__featured-bg" onClick={() => setPlaying('featured')}>
+                        <img
+                          className="media__featured-thumb"
+                          src={`https://img.youtube.com/vi/${mediaVideos[0].youtubeId}/maxresdefault.jpg`}
+                          alt={mediaVideos[0].title}
+                        />
+                        <div className="media__play-btn">▶</div>
+                      </div>
+                  }
                   <div className="media__featured-info">
                     <span className="tag tag--accent">Highlights</span>
-                    <h2 className="media__featured-title">Best Overtakes — 2025 Season So Far</h2>
-                    <p className="media__featured-duration">4:32</p>
+                    <h2 className="media__featured-title">{mediaVideos[0].title}</h2>
                   </div>
                 </div>
               </div>
@@ -738,16 +750,29 @@
                 <p className="section-label">Videos</p>
                 <div className="media__grid">
                   {mediaVideos.slice(1).map(video => (
-                    <div key={video.id} className={`media__card${playing===video.id?' media__card--playing':''}`} onClick={() => setPlaying(playing===video.id?null:video.id)}>
-                      <div className="media__thumb">
-                        <div className="media__thumb-play">{playing===video.id?'⏸':'▶'}</div>
-                        <span className="media__type" style={{background:typeColors[video.type]}}>{video.type}</span>
-                      </div>
+                    <div key={video.id} className="media__card">
+                      {playing===video.id
+                        ? <iframe
+                            className="media__card-iframe"
+                            src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1`}
+                            title={video.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        : <div className="media__thumb" onClick={() => setPlaying(video.id)}>
+                            <img
+                              className="media__thumb-img"
+                              src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
+                              alt={video.title}
+                            />
+                            <div className="media__thumb-play">▶</div>
+                            <span className="media__type" style={{background:typeColors[video.type]}}>{video.type}</span>
+                          </div>
+                      }
                       <div className="media__card-info">
                         <h3 className="media__card-title">{video.title}</h3>
                         <div className="media__card-meta">
-                          <span>{video.duration}</span>
-                          <button className="media__share" onClick={e=>{e.stopPropagation();alert('Share link copied!');}}>Share ↗</button>
+                          <a className="media__share" href={`https://www.youtube.com/watch?v=${video.youtubeId}`} target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a>
                         </div>
                       </div>
                     </div>
