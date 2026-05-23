@@ -204,9 +204,10 @@
     .media__share { background: none; border: none; color: var(--accent); font-size: .75rem; font-weight: 600; cursor: pointer; }
     .media__photos { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 1rem; }
     .media__photo { display: flex; flex-direction: column; gap: .5rem; }
-    .media__photo-placeholder { aspect-ratio: 4/3; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: border-color .15s; }
-    .media__photo-placeholder:hover { border-color: var(--accent); }
-    .media__photo-num { font-size: 2rem; font-weight: 900; color: var(--border); }
+    .media__photo-placeholder { aspect-ratio: 4/3; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; transition: border-color .15s, transform .2s; }
+    .media__photo-placeholder:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .media__photo-placeholder img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform .3s; }
+    .media__photo-placeholder:hover img { transform: scale(1.04); }
     .media__photo-label { font-size: .75rem; color: var(--muted); }
 
     /* NEWS */
@@ -328,9 +329,12 @@
     ];
 
     const photos = [
-      { id:1, label:'Helmet — 2025 livery'  }, { id:2, label:'Car — Suzuka launch'   },
-      { id:3, label:'Podium — Japanese GP'  }, { id:4, label:'Pit lane — Monaco'     },
-      { id:5, label:'Cockpit view — Imola'  }, { id:6, label:'Pre-race — Bahrain'    },
+      { id:1, label:'Victory — 2026 Chinese GP',       src:'https://upload.wikimedia.org/wikipedia/commons/c/cd/2026_Chinese_GP_-_Mercedes_-_Kimi_Antonelli_-_Post_Race_Celebration.jpg' },
+      { id:2, label:'Race — 2025 US Grand Prix',       src:'https://upload.wikimedia.org/wikipedia/commons/e/e8/Kimi_Antonelli_at_the_2025_US_Grand_Prix_in_Austin%2C_TX.jpg' },
+      { id:3, label:'Action — 2025 Emilia Romagna GP', src:'https://upload.wikimedia.org/wikipedia/commons/2/25/2025_Imola_GP_Kimi_Antonelli_%28cropped%29.jpg' },
+      { id:4, label:'On track — 2025 Imola',           src:'https://upload.wikimedia.org/wikipedia/commons/d/d8/2025_Imola_GP_Kimi_Antonelli.jpg' },
+      { id:5, label:'F2 — 2024 Barcelona',             src:'https://upload.wikimedia.org/wikipedia/commons/9/9d/Antonelli_Barcelona_2024_%28cropped%29.jpg' },
+      { id:6, label:'Podium — 2022 F4 Germany, Spa',   src:'https://upload.wikimedia.org/wikipedia/commons/3/30/F4_Germany_2022_Spa_Podium_Race_1_%281%29_%28cropped%29.jpg' },
     ];
 
     const trivia = [
@@ -759,7 +763,9 @@
                 <div className="media__photos">
                   {photos.map(photo => (
                     <div key={photo.id} className="media__photo">
-                      <div className="media__photo-placeholder"><span className="media__photo-num">#{photo.id}</span></div>
+                      <div className="media__photo-placeholder">
+                        <img src={photo.src} alt={photo.label} />
+                      </div>
                       <p className="media__photo-label">{photo.label}</p>
                     </div>
                   ))}
