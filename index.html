@@ -229,6 +229,15 @@
     .news__card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: .25rem; }
     .news__card-date { font-size: .75rem; color: var(--muted); }
     .news__read-more { background: none; border: none; color: var(--accent); font-size: .8rem; font-weight: 600; cursor: pointer; }
+    .news__read-more:hover { text-decoration: underline; }
+    .news__modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .news__modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; max-width: 680px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 2rem; position: relative; }
+    .news__modal-close { position: absolute; top: 1rem; right: 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: .9rem; display: flex; align-items: center; justify-content: center; }
+    .news__modal-close:hover { border-color: var(--accent); color: var(--accent); }
+    .news__modal-tags { margin-bottom: 1rem; display: flex; gap: .5rem; }
+    .news__modal-title { font-size: 1.4rem; font-weight: 800; line-height: 1.3; margin-bottom: .5rem; }
+    .news__modal-date { font-size: .8rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .news__modal-body p { font-size: .95rem; line-height: 1.75; color: var(--muted); margin-bottom: 1.25rem; }
     @media (max-width:700px) { .news__card--featured { grid-column: 1; } }
 
     /* FAN ZONE */
@@ -263,7 +272,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    const { useState, useContext, createContext } = React;
+    const { useState, useEffect, useContext, createContext } = React;
 
     // ── ROUTER (no external library needed) ──────────────────────────────────
     const NavCtx = createContext({ page: 'home', navigate: () => {} });
@@ -311,12 +320,30 @@
     ];
 
     const newsArticles = [
-      { id:1, tag:'Race Report', breaking:false, title:'Antonelli Takes Stunning Victory at Imola in Front of Home Crowd',                  excerpt:'The young Italian made the most of his home race, starting from pole and leading every lap to claim his second win of the season.',                                               date:'May 18, 2025' },
-      { id:2, tag:'Breaking',    breaking:true,  title:'Monaco Preview: Antonelli Targets Third Podium in a Row',                             excerpt:'After back-to-back podiums in China and Miami, the 19-year-old heads to the streets of Monte Carlo full of confidence.',                                                    date:'May 22, 2025' },
-      { id:3, tag:'Interview',   breaking:false, title:'"I Feel More at Home Every Race" — Antonelli Opens Up on His F1 Debut Season',       excerpt:'In an exclusive interview, Kimi reflects on life at Mercedes, learning from George Russell, and what it means to carry Italian hopes.',                                   date:'May 10, 2025' },
-      { id:4, tag:'Stats',       breaking:false, title:'By the Numbers: How Antonelli Compares to F1 Rookies of the Past Decade',            excerpt:"Seven podiums in eight races puts him in elite company. We crunch the numbers on F1's most impressive debut campaigns.",                                                      date:'May 5,  2025' },
-      { id:5, tag:'Team News',   breaking:false, title:'Mercedes Confirm Antonelli in Their Long-Term Plans',                                 excerpt:'Team Principal Toto Wolff says the Italian prodigy is "the real deal" and that Mercedes will build their future around him.',                                               date:'Apr 28, 2025' },
-      { id:6, tag:'Race Report', breaking:false, title:'Japanese GP: Antonelli Claims First F1 Victory at Suzuka',                           excerpt:'Starting from pole, the 19-year-old drove a flawless race to take his maiden Grand Prix win on one of the most demanding circuits.',                                        date:'Apr 6,  2025' },
+      { id:1, tag:'Race Report', breaking:false, title:'Antonelli Takes Stunning Victory at Imola in Front of Home Crowd',
+        excerpt:'The young Italian made the most of his home race, starting from pole and leading every lap to claim his second win of the season.',
+        body:`Kimi Antonelli delivered a masterclass at his home race, holding pole position from lights-to-flag to take a dominant victory at Imola. The 19-year-old Mercedes driver controlled every aspect of the race, building a comfortable gap in the opening stint before managing his tyres to perfection in the closing laps.\n\nThe crowd at Autodromo Enzo e Dino Ferrari erupted when Antonelli crossed the line, with thousands of Italian flags waving in the grandstands. It was an emotional moment for the Bologna-born driver, who dedicated the win to his family and the tifosi.\n\n"This is the most special feeling of my life," Antonelli said on the podium. "To win here, at home, with all these people cheering — I cannot describe it. I gave everything today."\n\nThe result moves Antonelli to the top of the Drivers' Championship, with a 12-point lead heading into the Monaco Grand Prix.`,
+        date:'May 18, 2025' },
+      { id:2, tag:'Breaking',    breaking:true,  title:'Monaco Preview: Antonelli Targets Third Podium in a Row',
+        excerpt:'After back-to-back podiums in China and Miami, the 19-year-old heads to the streets of Monte Carlo full of confidence.',
+        body:`Kimi Antonelli arrives in Monaco on the back of a remarkable run of form — five consecutive points finishes including two wins and three podiums. The Principality presents a unique challenge, but the young Italian says he is ready.\n\n"Monaco is unlike anywhere else," Antonelli told the media on Thursday. "There is no margin for error, but that is what makes it exciting. I love circuits where you have to be perfect every single lap."\n\nMercedes have brought an upgraded floor package to Monaco, which should suit the tight and twisty layout. Simulations suggest the W16 could be particularly competitive through the swimming pool section.\n\nTeam Principal Toto Wolff confirmed that Antonelli will carry the team's full technical development focus for the rest of the season: "Kimi has earned everything we have. The car, the strategy, the people — they are all behind him."`,
+        date:'May 22, 2025' },
+      { id:3, tag:'Interview',   breaking:false, title:'"I Feel More at Home Every Race" — Antonelli Opens Up on His F1 Debut Season',
+        excerpt:'In an exclusive interview, Kimi reflects on life at Mercedes, learning from George Russell, and what it means to carry Italian hopes.',
+        body:`Eight races into his debut Formula 1 season, Kimi Antonelli sits down to reflect on a whirlwind few months that have exceeded everyone's expectations — including his own.\n\n"At the start of the year I told myself: just learn, don't make mistakes, try to score points when you can. I didn't expect any of this," he says, gesturing at the championship standings on his phone screen.\n\nOn his teammate George Russell: "George has been incredible. He pushes me every session. I watch everything he does — his approach to tyre management, his briefings with the engineers. I have learned so much."\n\nOn representing Italy: "It means everything. When I hear the Italian anthem, when I see the flags — that is something I carry into every qualifying lap and every race. It is a responsibility, but a beautiful one."`,
+        date:'May 10, 2025' },
+      { id:4, tag:'Stats',       breaking:false, title:'By the Numbers: How Antonelli Compares to F1 Rookies of the Past Decade',
+        excerpt:"Seven podiums in eight races puts him in elite company. We crunch the numbers on F1's most impressive debut campaigns.",
+        body:`Seven podiums in eight races. A win in just his fourth start. A championship lead by round eight. Kimi Antonelli's debut numbers are extraordinary — but how do they stack up against the great rookie campaigns in recent F1 history?\n\nFor comparison: Max Verstappen scored zero podiums in his debut year. Charles Leclerc managed two in his first season. Even Lewis Hamilton, widely regarded as the greatest debut in F1 history, had nine podiums in 17 races in 2007.\n\nAntonelli is on a historic pace. His average finishing position of 2.6 through eight rounds is the best since records began. His qualifying average of 1.8 grid positions lost to his teammate is the tightest margin for any rookie pairing in the turbo-hybrid era.\n\nThe numbers suggest not just a good rookie — but a generational one.`,
+        date:'May 5,  2025' },
+      { id:5, tag:'Team News',   breaking:false, title:'Mercedes Confirm Antonelli in Their Long-Term Plans',
+        excerpt:'Team Principal Toto Wolff says the Italian prodigy is "the real deal" and that Mercedes will build their future around him.',
+        body:`Mercedes-AMG Petronas have confirmed that Kimi Antonelli is central to their long-term strategy, with Team Principal Toto Wolff describing the 19-year-old as "the generational talent we have been waiting for."\n\nIn a press briefing at the team's Brackley factory, Wolff outlined a multi-year vision built around the Italian driver. "We identified Kimi when he was 14. We have watched him develop through every category. What he is doing in his rookie F1 season is beyond even our most optimistic projections."\n\nA contract extension is expected to be announced before the summer break, with sources indicating a deal covering the 2026 and 2027 seasons, with options beyond.\n\n"We are not building around him for the next year," Wolff added. "We are building around him for the next decade."`,
+        date:'Apr 28, 2025' },
+      { id:6, tag:'Race Report', breaking:false, title:'Japanese GP: Antonelli Claims First F1 Victory at Suzuka',
+        excerpt:'Starting from pole, the 19-year-old drove a flawless race to take his maiden Grand Prix win on one of the most demanding circuits.',
+        body:`In a race that will be remembered for years, Kimi Antonelli took his first Formula 1 victory at Suzuka — arguably the most demanding circuit on the calendar — in only his fourth Grand Prix start.\n\nAntonelli qualified on pole by 0.3 seconds and led every lap of the race, managing an early safety car restart and a tricky mid-race rain shower with a composure that belied his age. His final lap times, set on 40-lap-old tyres, were within 0.2 seconds of his qualifying pace.\n\n"I was in the zone," he said afterwards, still wearing his helmet, tears visible as he climbed from the cockpit. "Every corner, every braking point — everything felt perfect today."\n\nIt was the first time a teenager had won at Suzuka since a young Ayrton Senna competed in the 1980s. A new legend, it seems, has arrived.`,
+        date:'Apr 6,  2025' },
     ];
 
     const mediaVideos = [
@@ -806,8 +833,33 @@
     function News() {
       const [subscribed, setSubscribed] = useState(false);
       const [email, setEmail] = useState('');
+      const [open, setOpen] = useState(null);
+      const article = newsArticles.find(a => a.id === open);
+
+      useEffect(() => {
+        const onKey = e => { if (e.key === 'Escape') setOpen(null); };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+      }, []);
+
       return (
         <div>
+          {article && (
+            <div className="news__modal-overlay" onClick={() => setOpen(null)}>
+              <div className="news__modal" onClick={e => e.stopPropagation()}>
+                <button className="news__modal-close" onClick={() => setOpen(null)}>✕</button>
+                <div className="news__modal-tags">
+                  <span className={`tag ${article.breaking?'tag--red':'tag--muted'}`}>{article.tag}</span>
+                  {article.breaking && <span className="tag tag--red">Breaking</span>}
+                </div>
+                <h2 className="news__modal-title">{article.title}</h2>
+                <p className="news__modal-date">{article.date}</p>
+                <div className="news__modal-body">
+                  {article.body.split('\n\n').map((p,i) => <p key={i}>{p}</p>)}
+                </div>
+              </div>
+            </div>
+          )}
           <section className="page-header">
             <div className="container"><p className="section-label">Latest</p><h1 className="page-title">News & Updates</h1></div>
           </section>
@@ -837,7 +889,7 @@
                   <p className="news__card-excerpt">{article.excerpt}</p>
                   <div className="news__card-footer">
                     <span className="news__card-date">{article.date}</span>
-                    <button className="news__read-more">Read more →</button>
+                    <button className="news__read-more" onClick={() => setOpen(article.id)}>Read more →</button>
                   </div>
                 </article>
               ))}
