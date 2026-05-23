@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kimi Antonelli · F1's Next Generation</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --accent: #00D2BE; --dark: #0d0d0d; --darker: #080808;
+      --surface: #161616; --surface2: #1e1e1e; --border: #2a2a2a;
+      --text: #f0f0f0; --muted: #888; --red: #e8002d;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); background: var(--darker); color: var(--text); line-height: 1.6; min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: var(--font); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--darker); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .section { padding: 5rem 0; }
+    .tag { display: inline-block; padding: .25rem .75rem; border-radius: 999px; font-size: .75rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+    .tag--accent { background: var(--accent); color: var(--dark); }
+    .tag--red { background: var(--red); color: #fff; }
+    .tag--muted { background: var(--surface2); color: var(--muted); }
+    .btn { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem 1.75rem; border-radius: 4px; font-size: .9rem; font-weight: 600; letter-spacing: .03em; transition: all .2s; border: none; }
+    .btn--primary { background: var(--accent); color: var(--dark); }
+    .btn--primary:hover { background: #00b8a8; transform: translateY(-1px); }
+    .btn--outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn--outline:hover { border-color: var(--accent); color: var(--accent); }
+    .page-title { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; letter-spacing: -.02em; line-height: 1.1; }
+    .section-label { font-size: .75rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); margin-bottom: .75rem; }
+    .divider { border: none; border-top: 1px solid var(--border); }
+    .app { min-height: 100vh; display: flex; flex-direction: column; }
+    .app__main { flex: 1; }
+    .page-header { padding: 4rem 0 3rem; border-bottom: 1px solid var(--border); }
+    .page-header__sub { color: var(--muted); margin-top: .5rem; font-size: .95rem; }
+
+    /* HEADER */
+    .header { position: sticky; top: 0; z-index: 100; background: rgba(8,8,8,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .header__inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .header__logo { display: flex; align-items: center; gap: .5rem; font-weight: 900; font-size: 1.1rem; cursor: pointer; }
+    .header__logo-num { background: var(--accent); color: var(--dark); width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 900; }
+    .header__nav { display: flex; align-items: center; gap: .25rem; }
+    .header__link { padding: .4rem .85rem; border-radius: 4px; font-size: .875rem; font-weight: 500; color: var(--muted); transition: color .15s, background .15s; cursor: pointer; border: none; background: none; }
+    .header__link:hover { color: var(--text); background: var(--surface); }
+    .header__link--active { color: var(--accent) !important; }
+    .header__burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 6px; }
+    .header__burger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; }
+    @media (max-width:700px) {
+      .header__burger { display: flex; }
+      .header__nav { display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem; gap: .25rem; }
+      .header__nav--open { display: flex; }
+      .header__link { width: 100%; padding: .75rem 1rem; font-size: 1rem; text-align: left; }
+    }
+
+    /* FOOTER */
+    .footer { background: var(--surface); border-top: 1px solid var(--border); padding: 3rem 0 1.5rem; }
+    .footer__inner { display: grid; grid-template-columns: 1fr auto auto; gap: 2rem; align-items: start; margin-bottom: 2rem; }
+    .footer__brand { display: flex; flex-direction: column; gap: .4rem; }
+    .footer__num { display: inline-flex; align-items: center; justify-content: center; background: var(--accent); color: var(--dark); width: 28px; height: 28px; border-radius: 4px; font-size: .8rem; font-weight: 900; }
+    .footer__name { font-weight: 700; font-size: 1rem; }
+    .footer__disclaimer { font-size: .75rem; color: var(--muted); max-width: 280px; line-height: 1.5; }
+    .footer__links { display: flex; flex-direction: column; gap: .5rem; }
+    .footer__links button { background: none; border: none; font-size: .875rem; color: var(--muted); transition: color .15s; cursor: pointer; text-align: left; padding: 0; }
+    .footer__links button:hover { color: var(--text); }
+    .footer__social { display: flex; gap: .75rem; }
+    .footer__social a { width: 36px; height: 36px; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: var(--muted); transition: all .15s; }
+    .footer__social a:hover { border-color: var(--accent); color: var(--accent); }
+    .footer__copy { text-align: center; font-size: .75rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 1.5rem; }
+    @media (max-width:700px) { .footer__inner { grid-template-columns: 1fr; } }
+
+    /* HOME */
+    .hero { position: relative; min-height: 90vh; display: flex; align-items: center; overflow: hidden; }
+    .hero__bg { position: absolute; inset: 0; z-index: 0; }
+    .hero__gradient { position: absolute; inset: 0; background: radial-gradient(ellipse at 70% 50%, rgba(0,210,190,.12) 0%, transparent 60%), linear-gradient(135deg,#0d0d0d 0%,#080808 100%); }
+    .hero__grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size: 60px 60px; }
+    .hero__content { position: relative; z-index: 1; padding-top: 5rem; padding-bottom: 5rem; }
+    .hero__tag { margin-bottom: 1.5rem; }
+    .hero__title { font-size: clamp(4rem,12vw,9rem); font-weight: 900; letter-spacing: -.04em; line-height: .95; margin-bottom: 1rem; }
+    .hero__title-accent { color: var(--accent); }
+    .hero__sub { font-size: 1.1rem; color: var(--muted); margin-bottom: 2rem; letter-spacing: .05em; }
+    .hero__result { display: inline-flex; align-items: center; gap: .75rem; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: .6rem 1.25rem; border-radius: 4px; margin-bottom: 2.5rem; font-size: .875rem; }
+    .hero__result-label { color: var(--muted); }
+    .hero__result-val { font-weight: 700; }
+    .hero__ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .hero__number { position: absolute; right: -2rem; top: 50%; transform: translateY(-50%); font-size: clamp(12rem,25vw,22rem); font-weight: 900; color: rgba(255,255,255,.025); letter-spacing: -.05em; pointer-events: none; user-select: none; line-height: 1; }
+    .hero__photo { position: absolute; right: 0; bottom: 0; top: 0; width: 45%; object-fit: cover; object-position: center center; mask-image: linear-gradient(to left, rgba(0,0,0,.7) 60%, transparent 100%); -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,.7) 60%, transparent 100%); pointer-events: none; }
+    @media (max-width: 900px) { .hero__photo { width: 55%; opacity: .35; } }
+    @media (max-width: 600px) { .hero__photo { display: none; } }
+    .stats-bar { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 2rem 0; }
+    .stats-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+    .stats-bar__item { display: flex; flex-direction: column; align-items: center; gap: .25rem; }
+    .stats-bar__val { font-size: 2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+    .stats-bar__label { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .home__cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    .home__card { display: flex; flex-direction: column; gap: .75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; transition: all .2s; position: relative; overflow: hidden; cursor: pointer; border-top: 3px solid transparent; }
+    .home__card--about { border-top-color: var(--accent); }
+    .home__card--career { border-top-color: #ffd700; }
+    .home__card--media { border-top-color: var(--red); }
+    .home__card:hover { border-bottom-color: #444; border-left-color: #444; border-right-color: #444; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+    .home__card-title { font-size: 1.3rem; font-weight: 800; line-height: 1.2; }
+    .home__card-text { font-size: .875rem; color: var(--muted); line-height: 1.6; flex: 1; }
+    .home__card-arrow { font-size: 1.2rem; color: var(--accent); transition: transform .2s; }
+    .home__card:hover .home__card-arrow { transform: translateX(4px); }
+    .home__news-teaser { background: var(--surface); }
+    .home__news-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .home__news-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1.5rem; }
+    .home__news-card { display: flex; flex-direction: column; gap: .75rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; transition: all .2s; cursor: pointer; }
+    .home__news-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .home__news-title { font-size: 1.05rem; font-weight: 700; line-height: 1.4; }
+    .home__news-date { font-size: .75rem; color: var(--muted); margin-top: auto; }
+    @media (max-width:900px) { .home__cards { grid-template-columns: 1fr; } .home__news-grid { grid-template-columns: 1fr; } }
+
+    /* ABOUT */
+    .about__bio-grid { display: grid; grid-template-columns: 300px 1fr; gap: 4rem; align-items: start; }
+    .about__portrait-placeholder { width: 100%; aspect-ratio: 3/4; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .about__portrait-placeholder img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
+    .about__portrait-num { font-size: 6rem; font-weight: 900; color: var(--border); }
+    .about__quote { margin-top: 1.5rem; border-left: 3px solid var(--accent); padding-left: 1rem; font-style: italic; color: var(--muted); font-size: .9rem; line-height: 1.6; }
+    .about__quote cite { display: block; font-size: .8rem; margin-top: .5rem; font-style: normal; color: var(--accent); }
+    .about__para { color: var(--muted); line-height: 1.8; margin-bottom: 1.25rem; font-size: .95rem; }
+    .about__meta { display: grid; grid-template-columns: repeat(2,1fr); gap: .75rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+    .about__meta-item { display: flex; flex-direction: column; gap: .2rem; }
+    .about__meta-label { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .about__meta-val { font-size: .95rem; font-weight: 600; }
+    .about__style { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .about__traits { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .about__trait { display: flex; align-items: center; gap: .5rem; background: var(--surface2); border: 1px solid var(--border); padding: .75rem 1.25rem; border-radius: 4px; font-weight: 600; font-size: .9rem; }
+    .about__trait-icon { color: var(--accent); font-size: .6rem; }
+    .about__timeline { display: flex; flex-direction: column; }
+    .about__timeline-item { display: grid; grid-template-columns: 80px 40px 1fr; align-items: start; }
+    .about__timeline-year { font-size: .8rem; font-weight: 700; color: var(--accent); padding-top: 2px; text-align: right; padding-right: 1rem; }
+    .about__timeline-line { display: flex; flex-direction: column; align-items: center; }
+    .about__timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 4px; flex-shrink: 0; }
+    .about__timeline-track { width: 2px; flex: 1; min-height: 40px; background: var(--border); }
+    .about__timeline-event { padding: 0 0 2rem 1rem; font-size: .95rem; color: var(--muted); line-height: 1.5; }
+    .about__cta { background: var(--surface); border-top: 1px solid var(--border); text-align: center; }
+
+    /* CAREER */
+    .career__summary { background: var(--surface); border-bottom: 1px solid var(--border); padding: 2.5rem 0; }
+    .career__summary-grid { display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; }
+    .career__stat { display: flex; flex-direction: column; align-items: center; gap: .25rem; }
+    .career__stat-val { font-size: 2.2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+    .career__stat-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .career__table-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .career__sort { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .career__sort-label { font-size: .75rem; color: var(--muted); font-weight: 600; }
+    .career__sort-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: .3rem .75rem; border-radius: 4px; font-size: .8rem; font-weight: 600; transition: all .15s; }
+    .career__sort-btn:hover { color: var(--text); border-color: #444; }
+    .career__sort-btn--active { background: var(--accent); color: var(--dark); border-color: var(--accent); }
+    .career__table-wrap { overflow-x: auto; }
+    .career__table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .career__table th { text-align: left; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: .75rem 1rem; border-bottom: 1px solid var(--border); }
+    .career__row { border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s; }
+    .career__row:hover { background: var(--surface); }
+    .career__row--selected { background: rgba(0,210,190,.06) !important; }
+    .career__row td { padding: 1rem; vertical-align: middle; }
+    .career__gp { display: flex; flex-direction: column; gap: .2rem; }
+    .career__gp-name { font-weight: 600; }
+    .career__gp-circuit { font-size: .75rem; color: var(--muted); }
+    .career__pos { font-weight: 700; font-size: 1rem; }
+    .career__pts { font-weight: 600; color: var(--accent); }
+    .career__modal { margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--accent); border-radius: 8px; padding: 2rem; position: relative; animation: fadeIn .15s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+    .career__modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; }
+    .career__modal-stats { display: grid; grid-template-columns: repeat(auto-fill,minmax(140px,1fr)); gap: 1rem; }
+    .career__modal-stats div { display: flex; flex-direction: column; gap: .2rem; }
+    .career__modal-stats span { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .career__modal-stats strong { font-size: 1.1rem; font-weight: 800; }
+
+    /* MEDIA */
+    .media__filters { display: flex; gap: .5rem; padding-top: 2rem; }
+    .media__filter { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: .5rem 1.25rem; border-radius: 999px; font-size: .875rem; font-weight: 600; transition: all .15s; }
+    .media__filter:hover { color: var(--text); border-color: #444; }
+    .media__filter--active { background: var(--accent); color: var(--dark); border-color: var(--accent); }
+    .media__featured { border-radius: 8px; overflow: hidden; cursor: pointer; border: 1px solid var(--border); transition: border-color .2s; }
+    .media__featured:hover { border-color: var(--accent); }
+    .media__featured-bg { height: 320px; background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+    .media__play-btn { width: 72px; height: 72px; border-radius: 50%; background: rgba(0,210,190,.9); color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: transform .2s; }
+    .media__featured:hover .media__play-btn { transform: scale(1.1); }
+    .media__playing-indicator { position: absolute; bottom: 1rem; left: 1rem; font-size: .75rem; font-weight: 600; color: var(--accent); letter-spacing: .05em; }
+    .media__featured-info { padding: 1.25rem 1.5rem; background: var(--surface); display: flex; align-items: center; gap: 1rem; }
+    .media__featured-title { font-size: 1rem; font-weight: 700; flex: 1; }
+    .media__featured-duration { font-size: .8rem; color: var(--muted); flex-shrink: 0; }
+    .media__grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1.5rem; }
+    .media__card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: all .2s; }
+    .media__card:hover { border-color: #444; transform: translateY(-2px); }
+    .media__card--playing { border-color: var(--accent); }
+    .media__thumb { height: 160px; background: linear-gradient(135deg,#1a1a2e 0%,#16213e 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+    .media__thumb-play { width: 48px; height: 48px; border-radius: 50%; background: rgba(0,210,190,.85); color: var(--dark); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .media__type { position: absolute; bottom: .5rem; left: .5rem; font-size: .65rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: #000; padding: .2rem .5rem; border-radius: 3px; }
+    .media__card-info { padding: 1rem; }
+    .media__card-title { font-size: .9rem; font-weight: 600; line-height: 1.4; margin-bottom: .5rem; }
+    .media__card-meta { display: flex; align-items: center; justify-content: space-between; font-size: .75rem; color: var(--muted); }
+    .media__share { background: none; border: none; color: var(--accent); font-size: .75rem; font-weight: 600; cursor: pointer; }
+    .media__photos { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 1rem; }
+    .media__photo { display: flex; flex-direction: column; gap: .5rem; }
+    .media__photo-placeholder { aspect-ratio: 4/3; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: border-color .15s; }
+    .media__photo-placeholder:hover { border-color: var(--accent); }
+    .media__photo-num { font-size: 2rem; font-weight: 900; color: var(--border); }
+    .media__photo-label { font-size: .75rem; color: var(--muted); }
+
+    /* NEWS */
+    .news__subscribe { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.25rem 0; }
+    .news__subscribe-inner { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+    .news__subscribe-text { font-size: .9rem; font-weight: 600; }
+    .news__subscribe-form { display: flex; gap: .75rem; flex-wrap: wrap; }
+    .news__subscribe-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: .65rem 1rem; border-radius: 4px; font-size: .875rem; font-family: var(--font); min-width: 220px; outline: none; transition: border-color .15s; }
+    .news__subscribe-input:focus { border-color: var(--accent); }
+    .news__subscribe-success { color: var(--accent); font-weight: 600; font-size: .9rem; }
+    .news__grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); gap: 1.5rem; align-items: start; }
+    .news__card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; display: flex; flex-direction: column; gap: .75rem; transition: all .2s; }
+    .news__card:hover { border-color: #444; transform: translateY(-1px); }
+    .news__card--featured { grid-column: 1 / -1; border-left: 4px solid var(--accent); }
+    .news__card-tags { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .news__card-title { font-size: 1.1rem; font-weight: 700; line-height: 1.4; }
+    .news__card--featured .news__card-title { font-size: 1.35rem; }
+    .news__card-excerpt { font-size: .875rem; color: var(--muted); line-height: 1.7; flex: 1; }
+    .news__card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: .25rem; }
+    .news__card-date { font-size: .75rem; color: var(--muted); }
+    .news__read-more { background: none; border: none; color: var(--accent); font-size: .8rem; font-weight: 600; cursor: pointer; }
+    @media (max-width:700px) { .news__card--featured { grid-column: 1; } }
+
+    /* FAN ZONE */
+    .fanzone__trivia { display: flex; align-items: center; gap: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 2.5rem; }
+    .fanzone__trivia-nav { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 44px; height: 44px; border-radius: 50%; font-size: 1.4rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .15s; }
+    .fanzone__trivia-nav:hover { border-color: var(--accent); color: var(--accent); }
+    .fanzone__trivia-content { flex: 1; text-align: center; }
+    .fanzone__trivia-text { font-size: 1.15rem; font-weight: 500; line-height: 1.6; font-style: italic; }
+    .fanzone__trivia-count { display: block; margin-top: 1rem; font-size: .75rem; color: var(--muted); }
+    .fanzone__poll-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .fanzone__voted-msg { font-size: .875rem; color: var(--accent); font-weight: 600; margin: .5rem 0 1rem; }
+    .fanzone__poll { display: flex; flex-direction: column; gap: .75rem; margin-top: 1.5rem; }
+    .fanzone__poll-option { position: relative; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; text-align: left; width: 100%; overflow: hidden; transition: all .2s; cursor: pointer; }
+    .fanzone__poll-option:not(:disabled):hover { border-color: var(--accent); }
+    .fanzone__poll-option--winner { border-color: var(--accent); background: rgba(0,210,190,.06); }
+    .fanzone__poll-option--faded { opacity: .5; }
+    .fanzone__poll-option:disabled { cursor: default; }
+    .fanzone__poll-bar { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(0,210,190,.12); transition: width .6s ease; border-radius: 6px; }
+    .fanzone__poll-row { position: relative; display: flex; align-items: center; justify-content: space-between; }
+    .fanzone__poll-label { font-size: .9rem; font-weight: 600; }
+    .fanzone__poll-pct { font-size: .9rem; font-weight: 700; color: var(--accent); }
+    .fanzone__social { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 1rem; }
+    .fanzone__post { display: flex; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; align-items: flex-start; }
+    .fanzone__post-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: var(--dark); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .9rem; flex-shrink: 0; }
+    .fanzone__post-handle { font-size: .8rem; font-weight: 700; color: var(--accent); margin-bottom: .4rem; }
+    .fanzone__post-text { font-size: .875rem; color: var(--muted); line-height: 1.5; }
+    .fanzone__merch { background: linear-gradient(135deg,#0d1117 0%,#161b22 100%); border-top: 1px solid var(--border); padding: 3rem 0; }
+    .fanzone__merch-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useContext, createContext } = React;
+
+    // ── ROUTER (no external library needed) ──────────────────────────────────
+    const NavCtx = createContext({ page: 'home', navigate: () => {} });
+    const useNavigate = () => useContext(NavCtx).navigate;
+    const usePage     = () => useContext(NavCtx).page;
+
+    // ── DATA ─────────────────────────────────────────────────────────────────
+    const driver = {
+      fullName: 'Andrea Kimi Antonelli', dob: '25 August 2006',
+      nationality: 'Italian', hometown: 'Bologna, Italy',
+      team: 'Mercedes-AMG Petronas', number: 12,
+      bio: `Andrea Kimi Antonelli was born on 25 August 2006 in Bologna, Italy. The son of racing driver Marco Antonelli, Kimi grew up surrounded by motorsport from day one. He started karting at the age of seven and immediately showed a natural talent that had the whole paddock talking.\n\nAfter dominating the junior karting ranks across Europe, Antonelli moved into single-seaters and tore through every category he entered. His F2 campaign was one of the most dominant in recent memory, earning him the coveted seat at Mercedes-AMG Petronas F1 Team alongside George Russell — making him one of the youngest race drivers in Formula 1 history.`,
+      quote: "I don't feel any pressure. I just love to drive.",
+      traits: ['Aggressive Overtaker', 'Rain Master', 'Consistent Qualifier'],
+      stats: { points: 100, position: 1, wins: 3, podiums: 4, fastestLaps: 3, qualAvg: 1.25 },
+    };
+
+    const raceResults = [
+      { gp:'Bahrain GP',        circuit:'Bahrain International', date:'Mar 2',  grid:3, result:5, points:10 },
+      { gp:'Saudi Arabian GP',  circuit:'Jeddah Corniche',       date:'Mar 9',  grid:2, result:3, points:15 },
+      { gp:'Australian GP',     circuit:'Albert Park',           date:'Mar 23', grid:4, result:4, points:12 },
+      { gp:'Japanese GP',       circuit:'Suzuka',                date:'Apr 6',  grid:1, result:1, points:25 },
+      { gp:'Chinese GP',        circuit:'Shanghai',              date:'Apr 20', grid:2, result:2, points:18 },
+      { gp:'Miami GP',          circuit:'Miami International',   date:'May 4',  grid:5, result:6, points:8  },
+      { gp:'Emilia Romagna GP', circuit:'Imola',                 date:'May 18', grid:1, result:1, points:25 },
+      { gp:'Monaco GP',         circuit:'Circuit de Monaco',     date:'May 25', grid:3, result:3, points:15 },
+    ];
+
+    const raceResults2026 = [
+      { gp:'Australian GP', circuit:'Albert Park',         date:'Mar 8',  grid:2, result:2, points:18 },
+      { gp:'Chinese GP',    circuit:'Shanghai',            date:'Mar 15', grid:1, result:1, points:29 },
+      { gp:'Japanese GP',   circuit:'Suzuka',              date:'Mar 29', grid:1, result:1, points:25 },
+      { gp:'Miami GP',      circuit:'Miami International', date:'May 3',  grid:1, result:1, points:28 },
+    ];
+
+    const careerTimeline = [
+      { year:'2013', event:'Starts karting aged 7 in Bologna' },
+      { year:'2018', event:'Wins Italian KF Junior Championship' },
+      { year:'2020', event:'Dominates FIA Karting European Championship' },
+      { year:'2021', event:'Moves to single-seaters, wins F4 Italy title' },
+      { year:'2022', event:'Signs as Mercedes junior driver' },
+      { year:'2023', event:'Wins F3 European Championship' },
+      { year:'2024', event:'Dominant F2 season — 9 wins, champion' },
+      { year:'2025', event:'Makes F1 debut with Mercedes-AMG Petronas' },
+    ];
+
+    const newsArticles = [
+      { id:1, tag:'Race Report', breaking:false, title:'Antonelli Takes Stunning Victory at Imola in Front of Home Crowd',                  excerpt:'The young Italian made the most of his home race, starting from pole and leading every lap to claim his second win of the season.',                                               date:'May 18, 2025' },
+      { id:2, tag:'Breaking',    breaking:true,  title:'Monaco Preview: Antonelli Targets Third Podium in a Row',                             excerpt:'After back-to-back podiums in China and Miami, the 19-year-old heads to the streets of Monte Carlo full of confidence.',                                                    date:'May 22, 2025' },
+      { id:3, tag:'Interview',   breaking:false, title:'"I Feel More at Home Every Race" — Antonelli Opens Up on His F1 Debut Season',       excerpt:'In an exclusive interview, Kimi reflects on life at Mercedes, learning from George Russell, and what it means to carry Italian hopes.',                                   date:'May 10, 2025' },
+      { id:4, tag:'Stats',       breaking:false, title:'By the Numbers: How Antonelli Compares to F1 Rookies of the Past Decade',            excerpt:"Seven podiums in eight races puts him in elite company. We crunch the numbers on F1's most impressive debut campaigns.",                                                      date:'May 5,  2025' },
+      { id:5, tag:'Team News',   breaking:false, title:'Mercedes Confirm Antonelli in Their Long-Term Plans',                                 excerpt:'Team Principal Toto Wolff says the Italian prodigy is "the real deal" and that Mercedes will build their future around him.',                                               date:'Apr 28, 2025' },
+      { id:6, tag:'Race Report', breaking:false, title:'Japanese GP: Antonelli Claims First F1 Victory at Suzuka',                           excerpt:'Starting from pole, the 19-year-old drove a flawless race to take his maiden Grand Prix win on one of the most demanding circuits.',                                        date:'Apr 6,  2025' },
+    ];
+
+    const mediaVideos = [
+      { id:1, title:'Best Overtakes — 2025 Season So Far', duration:'4:32', type:'Highlights'  },
+      { id:2, title:'Onboard Lap — Suzuka Qualifying',     duration:'1:29', type:'Onboard'     },
+      { id:3, title:'Post-Race Interview — Imola Victory', duration:'3:10', type:'Interview'   },
+      { id:4, title:'Career Story: From Karting to F1',    duration:'8:45', type:'Documentary' },
+      { id:5, title:'Onboard Lap — Monaco Qualifying',     duration:'1:22', type:'Onboard'     },
+      { id:6, title:'Team Radio Highlights — 2025 Season', duration:'5:18', type:'Highlights'  },
+    ];
+
+    const photos = [
+      { id:1, label:'Helmet — 2025 livery'  }, { id:2, label:'Car — Suzuka launch'   },
+      { id:3, label:'Podium — Japanese GP'  }, { id:4, label:'Pit lane — Monaco'     },
+      { id:5, label:'Cockpit view — Imola'  }, { id:6, label:'Pre-race — Bahrain'    },
+    ];
+
+    const trivia = [
+      "Kimi started karting at just 7 years old in Bologna.",
+      "His father Marco Antonelli was also a racing driver.",
+      "He won the F2 Championship in 2024 with 9 race victories.",
+      "He is one of the youngest drivers ever to race for Mercedes in F1.",
+      "His favourite circuit is Suzuka — where he scored his first F1 win.",
+      "He speaks Italian, English, and some German.",
+      "He wears the number 12 in honour of his grandmother's birthday month.",
+    ];
+
+    const pollOptions = [
+      { id:'suzuka', label:'First win at Suzuka 🏆',                   votes:482 },
+      { id:'imola',  label:'Home victory at Imola 🇮🇹',                votes:761 },
+      { id:'jeddah', label:'Comeback podium in Jeddah',                 votes:213 },
+      { id:'china',  label:'Wheel-to-wheel with the champion in China', votes:349 },
+    ];
+
+    const typeColors = { Highlights:'#00D2BE', Onboard:'#9b59b6', Interview:'#e67e22', Documentary:'#e8002d' };
+    const posColor = p => p===1?'#ffd700':p===2?'#c0c0c0':p===3?'#cd7f32':p<=10?'var(--accent)':'var(--muted)';
+
+    // ── HEADER ────────────────────────────────────────────────────────────────
+    function Header() {
+      const [open, setOpen] = useState(false);
+      const navigate = useNavigate();
+      const page = usePage();
+      const links = [
+        {id:'home',    label:'Home'},
+        {id:'about',   label:'About'},
+        {id:'career',  label:'Career'},
+        {id:'media',   label:'Media'},
+        {id:'news',    label:'News'},
+        {id:'fan',     label:'Fan Zone'},
+      ];
+      const go = id => { navigate(id); setOpen(false); window.scrollTo(0,0); };
+      return (
+        <header className="header">
+          <div className="container header__inner">
+            <div className="header__logo" onClick={() => go('home')}>
+              <span className="header__logo-num">12</span>
+              <span style={{color:'var(--text)'}}>Antonelli</span>
+            </div>
+            <nav className={`header__nav${open?' header__nav--open':''}`}>
+              {links.map(({id, label}) => (
+                <button key={id} className={`header__link${page===id?' header__link--active':''}`} onClick={() => go(id)}>
+                  {label}
+                </button>
+              ))}
+            </nav>
+            <button className="header__burger" onClick={() => setOpen(o=>!o)} aria-label="Toggle menu">
+              <span/><span/><span/>
+            </button>
+          </div>
+        </header>
+      );
+    }
+
+    // ── FOOTER ────────────────────────────────────────────────────────────────
+    function Footer() {
+      const navigate = useNavigate();
+      const go = id => { navigate(id); window.scrollTo(0,0); };
+      return (
+        <footer className="footer">
+          <div className="container footer__inner">
+            <div className="footer__brand">
+              <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+                <span className="footer__num">12</span>
+                <span className="footer__name">Antonelli</span>
+              </div>
+              <p className="footer__disclaimer">Unofficial fan site. Not affiliated with Kimi Antonelli or Mercedes-AMG Petronas F1 Team.</p>
+            </div>
+            <nav className="footer__links">
+              {[['about','About'],['career','Career'],['media','Media'],['news','News'],['fan','Fan Zone']].map(([id,label]) => (
+                <button key={id} onClick={() => go(id)}>{label}</button>
+              ))}
+            </nav>
+            <div className="footer__social">
+              <a href="#" aria-label="Instagram">IG</a>
+              <a href="#" aria-label="X">X</a>
+              <a href="#" aria-label="YouTube">YT</a>
+            </div>
+          </div>
+          <p className="footer__copy">© 2025 Kimi Antonelli Fan Site</p>
+        </footer>
+      );
+    }
+
+    // ── HOME ──────────────────────────────────────────────────────────────────
+    function Home() {
+      const navigate = useNavigate();
+      const go = id => { navigate(id); window.scrollTo(0,0); };
+      const { stats } = driver;
+      return (
+        <div>
+          <section className="hero">
+            <div className="hero__bg"><div className="hero__gradient"/><div className="hero__grid"/></div>
+            <div className="container hero__content">
+              <span className="tag tag--accent hero__tag">Mercedes-AMG Petronas · #12</span>
+              <h1 className="hero__title">Kimi<br/><span className="hero__title-accent">Antonelli</span></h1>
+              <p className="hero__sub">F1's Next Generation · 19 · Italian</p>
+              <div className="hero__result">
+                <span className="hero__result-label">Latest result</span>
+                <span className="hero__result-val">P1 · Miami GP 2026</span>
+              </div>
+              <div className="hero__ctas">
+                <button className="btn btn--primary" onClick={() => go('about')}>Meet Kimi →</button>
+                <button className="btn btn--outline" onClick={() => go('career')}>Season Stats</button>
+              </div>
+            </div>
+            <img
+              className="hero__photo"
+              src="https://upload.wikimedia.org/wikipedia/commons/d/d8/2025_Imola_GP_Kimi_Antonelli.jpg"
+              alt="Kimi Antonelli at the 2025 Emilia Romagna GP"
+              aria-hidden="true"
+            />
+          </section>
+
+          <section className="stats-bar">
+            <div className="container stats-bar__inner">
+              {[['Championship Pos',`P${stats.position}`],['Points',stats.points],['Wins',stats.wins],['Podiums',stats.podiums],['Season','2026']].map(([label,value]) => (
+                <div key={label} className="stats-bar__item">
+                  <span className="stats-bar__val">{value}</span>
+                  <span className="stats-bar__label">{label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="container">
+              <p className="section-label">Explore</p>
+              <h2 className="page-title" style={{marginBottom:'2.5rem'}}>Get to know<br/>the driver</h2>
+              <div className="home__cards">
+                {[
+                  {cls:'about',  id:'about',  title:'Who is Kimi?',  text:'His story, background, and what makes him special on track.'},
+                  {cls:'career', id:'career', title:'Race by race',  text:'Full 2025 season results, standings, and career progression.'},
+                  {cls:'media',  id:'media',  title:'Watch & see',   text:'Highlights, onboards, interviews, and the best photos.'},
+                ].map(({cls,id,title,text}) => (
+                  <div key={id} className={`home__card home__card--${cls}`} onClick={() => go(id)}>
+                    <span className="tag tag--muted">{cls.charAt(0).toUpperCase()+cls.slice(1)}</span>
+                    <h3 className="home__card-title">{title}</h3>
+                    <p className="home__card-text">{text}</p>
+                    <span className="home__card-arrow">→</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="section home__news-teaser">
+            <div className="container">
+              <div className="home__news-header">
+                <div>
+                  <p className="section-label">Latest</p>
+                  <h2 className="page-title" style={{fontSize:'2rem'}}>News & Updates</h2>
+                </div>
+                <button className="btn btn--outline" onClick={() => go('news')}>All news →</button>
+              </div>
+              <div className="home__news-grid">
+                {[
+                  {tag:'Breaking',    title:'Monaco Preview: Antonelli Targets Third Podium in a Row',          date:'May 22, 2025'},
+                  {tag:'Race Report', title:'Antonelli Takes Stunning Victory at Imola in Front of Home Crowd', date:'May 18, 2025'},
+                ].map(({tag,title,date}) => (
+                  <div key={title} className="home__news-card" onClick={() => go('news')}>
+                    <span className={`tag ${tag==='Breaking'?'tag--red':'tag--muted'}`}>{tag}</span>
+                    <h3 className="home__news-title">{title}</h3>
+                    <span className="home__news-date">{date}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // ── ABOUT ─────────────────────────────────────────────────────────────────
+    function About() {
+      const navigate = useNavigate();
+      const go = id => { navigate(id); window.scrollTo(0,0); };
+      return (
+        <div>
+          <section className="page-header">
+            <div className="container">
+              <p className="section-label">The Driver</p>
+              <h1 className="page-title">{driver.fullName}</h1>
+              <p className="page-header__sub">{driver.nationality} · {driver.team} · #{driver.number}</p>
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="container about__bio-grid">
+              <div>
+                <div className="about__portrait-placeholder">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/c/cd/2026_Chinese_GP_-_Mercedes_-_Kimi_Antonelli_-_Post_Race_Celebration.jpg" alt="Kimi Antonelli celebrating victory at the 2026 Chinese GP" />
+                </div>
+                <blockquote className="about__quote">"{driver.quote}"<cite>— Kimi Antonelli</cite></blockquote>
+              </div>
+              <div>
+                <p className="section-label">Biography</p>
+                {driver.bio.split('\n\n').map((para,i) => <p key={i} className="about__para">{para}</p>)}
+                <div className="about__meta">
+                  {[['Date of Birth',driver.dob],['Hometown',driver.hometown],['Nationality',driver.nationality],['Team',driver.team],['Car Number',`#${driver.number}`]].map(([label,value]) => (
+                    <div key={label} className="about__meta-item">
+                      <span className="about__meta-label">{label}</span>
+                      <span className="about__meta-val">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="section about__style">
+            <div className="container">
+              <p className="section-label">On Track</p>
+              <h2 style={{fontSize:'1.75rem',fontWeight:800,marginBottom:'1.5rem'}}>Driving Style</h2>
+              <div className="about__traits">
+                {driver.traits.map(t => (
+                  <div key={t} className="about__trait"><span className="about__trait-icon">◆</span><span>{t}</span></div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="container">
+              <p className="section-label">Journey</p>
+              <h2 style={{fontSize:'1.75rem',fontWeight:800,marginBottom:'2.5rem'}}>Career Timeline</h2>
+              <div className="about__timeline">
+                {careerTimeline.map(({year,event},i) => (
+                  <div key={year} className="about__timeline-item">
+                    <div className="about__timeline-year">{year}</div>
+                    <div className="about__timeline-line">
+                      <div className="about__timeline-dot"/>
+                      {i < careerTimeline.length-1 && <div className="about__timeline-track"/>}
+                    </div>
+                    <div className="about__timeline-event">{event}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="section about__cta">
+            <div className="container">
+              <p style={{color:'var(--muted)'}}>Ready to see how he's performing?</p>
+              <button className="btn btn--primary" style={{marginTop:'1rem'}} onClick={() => go('career')}>See his stats →</button>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // ── CAREER ────────────────────────────────────────────────────────────────
+    function Career() {
+      const navigate = useNavigate();
+      const go = id => { navigate(id); window.scrollTo(0,0); };
+      const [season, setSeason] = useState('2026');
+      const [sortKey, setSortKey] = useState('date');
+      const [selectedGP, setSelectedGP] = useState(null);
+      const { stats } = driver;
+
+      const activeResults = season === '2026' ? raceResults2026 : raceResults;
+      const sorted = [...activeResults].sort((a,b) =>
+        sortKey==='result'?a.result-b.result:sortKey==='grid'?a.grid-b.grid:sortKey==='points'?b.points-a.points:0
+      );
+
+      const seasonStats2026 = { points:100, position:1, wins:3, podiums:4, fastestLaps:3, qualAvg:'P1.3' };
+      const seasonStats2025 = { points:147, position:4, wins:2, podiums:7, fastestLaps:4, qualAvg:'P2.8' };
+      const activeStat = season === '2026' ? seasonStats2026 : seasonStats2025;
+
+      return (
+        <div>
+          <section className="page-header">
+            <div className="container" style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',flexWrap:'wrap',gap:'1rem'}}>
+              <div>
+                <p className="section-label">{season} Season</p>
+                <h1 className="page-title">Season Stats</h1>
+              </div>
+              <div style={{display:'flex',gap:'.5rem',paddingBottom:'.25rem'}}>
+                {['2026','2025'].map(y => (
+                  <button key={y} onClick={()=>{setSeason(y);setSortKey('date');setSelectedGP(null);}}
+                    className={`career__sort-btn${season===y?' career__sort-btn--active':''}`}
+                    style={{fontSize:'.95rem',padding:'.4rem 1rem'}}>
+                    {y}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="career__summary">
+            <div className="container career__summary-grid">
+              {[['Championship',`P${activeStat.position}`],['Points',activeStat.points],['Wins',activeStat.wins],['Podiums',activeStat.podiums],['Fastest Laps',activeStat.fastestLaps],['Avg Qualifying',activeStat.qualAvg]].map(([label,value]) => (
+                <div key={label} className="career__stat">
+                  <span className="career__stat-val">{value}</span>
+                  <span className="career__stat-label">{label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="container">
+              <div className="career__table-header">
+                <div>
+                  <p className="section-label">Race by Race</p>
+                  <h2 style={{fontSize:'1.5rem',fontWeight:800}}>{season} Results</h2>
+                </div>
+                <div className="career__sort">
+                  <span className="career__sort-label">Sort by</span>
+                  {['date','result','grid','points'].map(k => (
+                    <button key={k} onClick={() => setSortKey(k)} className={`career__sort-btn${sortKey===k?' career__sort-btn--active':''}`}>
+                      {k.charAt(0).toUpperCase()+k.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="career__table-wrap">
+                <table className="career__table">
+                  <thead><tr><th>Grand Prix</th><th>Date</th><th>Grid</th><th>Result</th><th>Points</th></tr></thead>
+                  <tbody>
+                    {sorted.map(race => (
+                      <tr key={race.gp} onClick={() => setSelectedGP(selectedGP?.gp===race.gp?null:race)}
+                          className={`career__row${selectedGP?.gp===race.gp?' career__row--selected':''}`}>
+                        <td><div className="career__gp"><span className="career__gp-name">{race.gp}</span><span className="career__gp-circuit">{race.circuit}</span></div></td>
+                        <td>{race.date}</td>
+                        <td>P{race.grid}</td>
+                        <td><span className="career__pos" style={{color:posColor(race.result)}}>P{race.result}</span></td>
+                        <td className="career__pts">+{race.points}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {selectedGP && (
+                <div className="career__modal">
+                  <button className="career__modal-close" onClick={() => setSelectedGP(null)}>✕</button>
+                  <p className="section-label">{selectedGP.date}</p>
+                  <h3 style={{fontSize:'1.4rem',fontWeight:800,marginBottom:'1.25rem'}}>{selectedGP.gp}</h3>
+                  <div className="career__modal-stats">
+                    {[['Circuit',selectedGP.circuit],['Grid',`P${selectedGP.grid}`],['Finish',`P${selectedGP.result}`],['Points',`+${selectedGP.points}`],['Positions gained',selectedGP.grid-selectedGP.result>0?`+${selectedGP.grid-selectedGP.result}`:String(selectedGP.grid-selectedGP.result)]].map(([label,val],i) => (
+                      <div key={label}><span>{label}</span><strong style={i===2?{color:posColor(selectedGP.result)}:{}}>{val}</strong></div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section className="section" style={{paddingTop:0}}>
+            <div className="container">
+              <hr className="divider" style={{marginBottom:'2rem'}}/>
+              <p style={{color:'var(--muted)',marginBottom:'1rem'}}>Want to see him in action?</p>
+              <button className="btn btn--primary" onClick={() => go('media')}>Watch his highlights →</button>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // ── MEDIA ─────────────────────────────────────────────────────────────────
+    function Media() {
+      const [filter, setFilter] = useState('All');
+      const [playing, setPlaying] = useState(null);
+      const showVideos = filter==='All'||filter==='Videos';
+      const showPhotos = filter==='All'||filter==='Photos';
+      return (
+        <div>
+          <section className="page-header">
+            <div className="container"><p className="section-label">Gallery</p><h1 className="page-title">Media</h1></div>
+          </section>
+          <div className="media__filters container">
+            {['All','Videos','Photos'].map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={`media__filter${filter===f?' media__filter--active':''}`}>{f}</button>
+            ))}
+          </div>
+          {showVideos && (
+            <section className="section" style={{paddingTop:'2rem'}}>
+              <div className="container">
+                <p className="section-label">Featured</p>
+                <div className="media__featured" onClick={() => setPlaying(playing==='featured'?null:'featured')}>
+                  <div className="media__featured-bg">
+                    <div className="media__play-btn">{playing==='featured'?'⏸':'▶'}</div>
+                    {playing==='featured'&&<div className="media__playing-indicator">Now playing</div>}
+                  </div>
+                  <div className="media__featured-info">
+                    <span className="tag tag--accent">Highlights</span>
+                    <h2 className="media__featured-title">Best Overtakes — 2025 Season So Far</h2>
+                    <p className="media__featured-duration">4:32</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+          {showVideos && (
+            <section className="section" style={{paddingTop:0}}>
+              <div className="container">
+                <p className="section-label">Videos</p>
+                <div className="media__grid">
+                  {mediaVideos.slice(1).map(video => (
+                    <div key={video.id} className={`media__card${playing===video.id?' media__card--playing':''}`} onClick={() => setPlaying(playing===video.id?null:video.id)}>
+                      <div className="media__thumb">
+                        <div className="media__thumb-play">{playing===video.id?'⏸':'▶'}</div>
+                        <span className="media__type" style={{background:typeColors[video.type]}}>{video.type}</span>
+                      </div>
+                      <div className="media__card-info">
+                        <h3 className="media__card-title">{video.title}</h3>
+                        <div className="media__card-meta">
+                          <span>{video.duration}</span>
+                          <button className="media__share" onClick={e=>{e.stopPropagation();alert('Share link copied!');}}>Share ↗</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+          {showPhotos && (
+            <section className="section" style={{paddingTop:filter==='All'?0:'2rem'}}>
+              <div className="container">
+                <p className="section-label">Photos</p>
+                <div className="media__photos">
+                  {photos.map(photo => (
+                    <div key={photo.id} className="media__photo">
+                      <div className="media__photo-placeholder"><span className="media__photo-num">#{photo.id}</span></div>
+                      <p className="media__photo-label">{photo.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+      );
+    }
+
+    // ── NEWS ──────────────────────────────────────────────────────────────────
+    function News() {
+      const [subscribed, setSubscribed] = useState(false);
+      const [email, setEmail] = useState('');
+      return (
+        <div>
+          <section className="page-header">
+            <div className="container"><p className="section-label">Latest</p><h1 className="page-title">News & Updates</h1></div>
+          </section>
+          <div className="news__subscribe">
+            <div className="container news__subscribe-inner">
+              {subscribed
+                ? <p className="news__subscribe-success">✓ You're in! We'll notify you before the next race.</p>
+                : <>
+                    <p className="news__subscribe-text">Get updates before the next race</p>
+                    <form className="news__subscribe-form" onSubmit={e=>{e.preventDefault();if(email.trim())setSubscribed(true);}}>
+                      <input type="email" placeholder="your@email.com" value={email} onChange={e=>setEmail(e.target.value)} className="news__subscribe-input" required/>
+                      <button type="submit" className="btn btn--primary">Subscribe</button>
+                    </form>
+                  </>
+              }
+            </div>
+          </div>
+          <section className="section">
+            <div className="container news__grid">
+              {newsArticles.map((article,i) => (
+                <article key={article.id} className={`news__card${i===0?' news__card--featured':''}`}>
+                  <div className="news__card-tags">
+                    <span className={`tag ${article.breaking?'tag--red':'tag--muted'}`}>{article.tag}</span>
+                    {article.breaking&&<span className="tag tag--red">Breaking</span>}
+                  </div>
+                  <h2 className="news__card-title">{article.title}</h2>
+                  <p className="news__card-excerpt">{article.excerpt}</p>
+                  <div className="news__card-footer">
+                    <span className="news__card-date">{article.date}</span>
+                    <button className="news__read-more">Read more →</button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // ── FAN ZONE ──────────────────────────────────────────────────────────────
+    function FanZone() {
+      const [triviaIdx, setTriviaIdx] = useState(0);
+      const [voted, setVoted] = useState(null);
+      const [votes, setVotes] = useState(pollOptions.reduce((acc,o)=>({...acc,[o.id]:o.votes}),{}));
+      const totalVotes = Object.values(votes).reduce((a,b)=>a+b,0);
+      const handleVote = id => { if(voted)return; setVoted(id); setVotes(v=>({...v,[id]:v[id]+1})); };
+      const socialPosts = [
+        {handle:'@f1fanatic',     text:'Antonelli in the rain at Monaco was something else 😤 #Kimi12'},
+        {handle:'@mercedesgirl',  text:'The way he set that lap time in Q3 just casually... this kid is special ⚡'},
+        {handle:'@formula1italy', text:'Italia ha un nuovo eroe! 🇮🇹 #Antonelli #F1'},
+        {handle:'@paddockwatch',  text:'P3 on debut year and getting better every race. The future is now.'},
+      ];
+      return (
+        <div>
+          <section className="page-header">
+            <div className="container"><p className="section-label">For the fans</p><h1 className="page-title">Fan Zone</h1></div>
+          </section>
+
+          <section className="section">
+            <div className="container">
+              <p className="section-label">Did You Know?</p>
+              <div className="fanzone__trivia">
+                <button className="fanzone__trivia-nav" onClick={()=>setTriviaIdx(i=>(i-1+trivia.length)%trivia.length)}>‹</button>
+                <div className="fanzone__trivia-content">
+                  <p className="fanzone__trivia-text">"{trivia[triviaIdx]}"</p>
+                  <span className="fanzone__trivia-count">{triviaIdx+1} / {trivia.length}</span>
+                </div>
+                <button className="fanzone__trivia-nav" onClick={()=>setTriviaIdx(i=>(i+1)%trivia.length)}>›</button>
+              </div>
+            </div>
+          </section>
+
+          <section className="section fanzone__poll-section">
+            <div className="container">
+              <p className="section-label">Fan Poll</p>
+              <h2 style={{fontSize:'1.5rem',fontWeight:800,marginBottom:'.5rem'}}>What's your favourite Antonelli moment so far?</h2>
+              {voted&&<p className="fanzone__voted-msg">Thanks for voting! {totalVotes.toLocaleString()} total votes.</p>}
+              <div className="fanzone__poll">
+                {pollOptions.map(option => {
+                  const pct = Math.round((votes[option.id]/(totalVotes||1))*100);
+                  return (
+                    <button key={option.id}
+                      className={`fanzone__poll-option${voted===option.id?' fanzone__poll-option--winner':''}${voted&&voted!==option.id?' fanzone__poll-option--faded':''}`}
+                      onClick={()=>handleVote(option.id)} disabled={!!voted}>
+                      <div className="fanzone__poll-bar" style={{width:voted?`${pct}%`:'0%'}}/>
+                      <div className="fanzone__poll-row">
+                        <span className="fanzone__poll-label">{option.label}</span>
+                        {voted&&<span className="fanzone__poll-pct">{pct}%</span>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="container">
+              <p className="section-label">Fan Reactions</p>
+              <h2 style={{fontSize:'1.5rem',fontWeight:800,marginBottom:'1.5rem'}}>#Kimi12 on social</h2>
+              <div className="fanzone__social">
+                {socialPosts.map(post => (
+                  <div key={post.handle} className="fanzone__post">
+                    <div className="fanzone__post-avatar">{post.handle[1].toUpperCase()}</div>
+                    <div><p className="fanzone__post-handle">{post.handle}</p><p className="fanzone__post-text">{post.text}</p></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="fanzone__merch">
+            <div className="container fanzone__merch-inner">
+              <div>
+                <p className="section-label">Official Store</p>
+                <h2 style={{fontSize:'1.5rem',fontWeight:800}}>Rep the #12</h2>
+                <p style={{color:'var(--muted)',marginTop:'.5rem'}}>Official Mercedes-AMG Petronas merch — caps, tees, and more.</p>
+              </div>
+              <a href="https://www.mercedesamgf1.com/en/shop" target="_blank" rel="noopener noreferrer" className="btn btn--primary">Shop now →</a>
+            </div>
+          </section>
+        </div>
+      );
+    }
+
+    // ── APP ───────────────────────────────────────────────────────────────────
+    const pages = { home:Home, about:About, career:Career, media:Media, news:News, fan:FanZone };
+
+    function App() {
+      const [page, setPage] = useState('home');
+      const Page = pages[page] || Home;
+      return (
+        <NavCtx.Provider value={{ page, navigate: setPage }}>
+          <div className="app">
+            <Header/>
+            <main className="app__main"><Page/></main>
+            <Footer/>
+          </div>
+        </NavCtx.Provider>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>
